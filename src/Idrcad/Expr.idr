@@ -14,6 +14,14 @@ data Expr
   | Multiply Expr Expr
   | Divide Expr Expr
   | Negate Expr
+  | Modulo Expr Expr
+  | Power Expr Expr
+  | Sine Expr
+  | Cosine Expr
+  | ArcCosine Expr
+  | ArcTangent2 Expr Expr
+  | SquareRoot Expr
+  | Floor Expr
 
 public export
 literal : Fixed -> Expr
@@ -47,6 +55,40 @@ public export
 negate : Expr -> Expr
 negate = Negate
 
+||| Geometry-only symbolic operations are preserved for OpenSCAD. They are
+||| deliberately outside the exact integer solver fragment.
+public export
+modulo : Expr -> Expr -> Expr
+modulo = Modulo
+
+public export
+power : Expr -> Expr -> Expr
+power = Power
+
+public export
+sine : Expr -> Expr
+sine = Sine
+
+public export
+cosine : Expr -> Expr
+cosine = Cosine
+
+public export
+arcCosine : Expr -> Expr
+arcCosine = ArcCosine
+
+public export
+arcTangent2 : Expr -> Expr -> Expr
+arcTangent2 = ArcTangent2
+
+public export
+squareRoot : Expr -> Expr
+squareRoot = SquareRoot
+
+public export
+floorExpr : Expr -> Expr
+floorExpr = Floor
+
 public export
 Environment : Type
 Environment = List (String, Fixed)
@@ -79,6 +121,14 @@ evaluate environment (Divide left right) =
     _ => Nothing
 evaluate environment (Negate expression) =
   map negateFixed (evaluate environment expression)
+evaluate environment (Modulo left right) = Nothing
+evaluate environment (Power base exponent) = Nothing
+evaluate environment (Sine angle) = Nothing
+evaluate environment (Cosine angle) = Nothing
+evaluate environment (ArcCosine value) = Nothing
+evaluate environment (ArcTangent2 y x) = Nothing
+evaluate environment (SquareRoot value) = Nothing
+evaluate environment (Floor value) = Nothing
 
 ||| Whether an expression is in the integer-linear fragment accepted by the
 ||| MiniZinc/CP-SAT backend. Multiplication is allowed only by whole constants;
@@ -97,3 +147,11 @@ isIntegerLinear (Multiply expression (Lit (MkFixed coefficient))) =
 isIntegerLinear (Multiply left right) = False
 isIntegerLinear (Divide left right) = False
 isIntegerLinear (Negate expression) = isIntegerLinear expression
+isIntegerLinear (Modulo left right) = False
+isIntegerLinear (Power base exponent) = False
+isIntegerLinear (Sine angle) = False
+isIntegerLinear (Cosine angle) = False
+isIntegerLinear (ArcCosine value) = False
+isIntegerLinear (ArcTangent2 y x) = False
+isIntegerLinear (SquareRoot value) = False
+isIntegerLinear (Floor value) = False

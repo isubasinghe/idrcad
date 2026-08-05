@@ -6,7 +6,11 @@ import Idrcad.Expr
 import Idrcad.Fixed
 import Idrcad.Geometry
 import Idrcad.Model
+import Idrcad.Examples.Advanced
 import Idrcad.Examples.FrontPanel
+import Idrcad.Examples.Functions
+import Idrcad.Examples.Old
+import Idrcad.Examples.Parametric
 import Idrcad.Examples.PartialFit
 
 e : Integer -> Expr
@@ -273,7 +277,7 @@ projectionPanel colour translation rotation source =
 public export
 projectionModel : Model ThreeD
 projectionModel =
-  let source = Import3D "projection.stl"
+  let source = Import3D "assets/openscad/Basics/projection.stl"
    in MkModel "OpenSCAD Basics: projection" [] [] Satisfy $
         Union
           [ Background source
@@ -474,12 +478,43 @@ basics =
   ]
 
 public export
+upstreamExamples : List (String, Model ThreeD)
+upstreamExamples = advanced ++ basics ++ functionExamples ++ old ++ parametric
+
+||| Every .scad file under the pinned upstream examples tree, in the same
+||| group order used by OpenSCAD.
+public export
+upstreamSourcePaths : List String
+upstreamSourcePaths =
+  [ "Advanced/GEB.scad", "Advanced/animation.scad", "Advanced/assert.scad"
+  , "Advanced/children.scad", "Advanced/children_indexed.scad"
+  , "Advanced/module_recursion.scad", "Advanced/offset.scad"
+  , "Advanced/surface_image.scad"
+  , "Basics/CSG.scad", "Basics/CSG-modules.scad", "Basics/LetterBlock.scad"
+  , "Basics/hull.scad", "Basics/linear_extrude.scad", "Basics/logo.scad"
+  , "Basics/logo_and_text.scad", "Basics/projection.scad", "Basics/roof.scad"
+  , "Basics/rotate_extrude.scad", "Basics/text_on_cube.scad"
+  , "Functions/echo.scad", "Functions/functions.scad"
+  , "Functions/list_comprehensions.scad", "Functions/polygon_areas.scad"
+  , "Functions/recursion.scad"
+  , "Old/example001.scad", "Old/example002.scad", "Old/example003.scad"
+  , "Old/example004.scad", "Old/example005.scad", "Old/example006.scad"
+  , "Old/example007.scad", "Old/example008.scad", "Old/example009.scad"
+  , "Old/example010.scad", "Old/example011.scad", "Old/example012.scad"
+  , "Old/example013.scad", "Old/example014.scad", "Old/example015.scad"
+  , "Old/example016.scad", "Old/example017.scad", "Old/example018.scad"
+  , "Old/example019.scad", "Old/example020.scad", "Old/example021.scad"
+  , "Old/example022.scad", "Old/example023.scad", "Old/example024.scad"
+  , "Parametric/candleStand.scad", "Parametric/sign.scad"
+  ]
+
+public export
 examples : List (String, Model ThreeD)
 examples =
-  ("constrained-fit", constrainedFitModel)
-    :: ("partial-fit", partialFitModel)
-    :: ("front-panel", frontPanelModel)
-    :: basics
+  [ ("constrained-fit", constrainedFitModel)
+  , ("partial-fit", partialFitModel)
+  , ("front-panel", frontPanelModel)
+  ] ++ upstreamExamples
 
 public export
 findExample : String -> Maybe (Model ThreeD)

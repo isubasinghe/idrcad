@@ -46,6 +46,17 @@ renderExpr (Multiply left right) =
 renderExpr (Divide left right) =
   "(" ++ renderExpr left ++ " / " ++ renderExpr right ++ ")"
 renderExpr (Negate expression) = "(-" ++ renderExpr expression ++ ")"
+renderExpr (Modulo left right) =
+  "(" ++ renderExpr left ++ " % " ++ renderExpr right ++ ")"
+renderExpr (Power base exponent) =
+  "pow(" ++ renderExpr base ++ ", " ++ renderExpr exponent ++ ")"
+renderExpr (Sine angle) = "sin(" ++ renderExpr angle ++ ")"
+renderExpr (Cosine angle) = "cos(" ++ renderExpr angle ++ ")"
+renderExpr (ArcCosine value) = "acos(" ++ renderExpr value ++ ")"
+renderExpr (ArcTangent2 y x) =
+  "atan2(" ++ renderExpr y ++ ", " ++ renderExpr x ++ ")"
+renderExpr (SquareRoot value) = "sqrt(" ++ renderExpr value ++ ")"
+renderExpr (Floor value) = "floor(" ++ renderExpr value ++ ")"
 
 renderVec2 : Vec2 -> String
 renderVec2 (MkVec2 x y) = "[" ++ renderExpr x ++ ", " ++ renderExpr y ++ "]"
@@ -141,6 +152,9 @@ renderShape depth (Text2D (MkTextOptions content size font horizontal vertical s
       ("valign", renderVertical vertical),
       ("spacing", renderExpr spacing)]
       ++ maybeArg "font" quoted font) ++ ";"
+renderShape depth (Import2D path layer) =
+  indent depth ++ call "import"
+    ([("file", quoted path)] ++ maybeArg "layer" quoted layer) ++ ";"
 renderShape depth (Cube size centered) =
   indent depth ++ call "cube"
     [("size", renderVec3 size), ("center", scadBool centered)] ++ ";"
@@ -152,8 +166,18 @@ renderShape depth (Cylinder height bottomRadius topRadius centered) =
      ("r1", renderExpr bottomRadius),
      ("r2", renderExpr topRadius),
      ("center", scadBool centered)] ++ ";"
+renderShape depth (Polyhedron points faces) =
+  indent depth ++ call "polyhedron"
+    [("points", "[" ++ joinWith ", " (map renderVec3 points) ++ "]"),
+     ("faces", "[" ++ joinWith ", " (map renderFace faces) ++ "]")] ++ ";"
+  where
+    renderFace : List Nat -> String
+    renderFace indices = "[" ++ joinWith ", " (map show indices) ++ "]"
 renderShape depth (Import3D path) =
   indent depth ++ call "import" [("file", quoted path)] ++ ";"
+renderShape depth (Surface path centered) =
+  indent depth ++ call "surface"
+    [("file", quoted path), ("center", scadBool centered)] ++ ";"
 renderShape depth (Union children) =
   renderBlock depth "union()"
     (joinWith "\n" (map (renderShape (S depth)) children))
@@ -210,6 +234,13 @@ renderShape depth (Roof method child) =
         StraightSkeleton => "straight"
         Voronoi => "voronoi"
    in renderBlock depth (call "roof" [("method", quoted methodName)])
+        (renderShape (S depth) child)
+renderShape depth (Offset2D mode child) =
+  let arguments = case mode of
+        RadialOffset radius => [("r", renderExpr radius)]
+        DeltaOffset delta chamfer =>
+          [("delta", renderExpr delta), ("chamfer", scadBool chamfer)]
+   in renderBlock depth (call "offset" arguments)
         (renderShape (S depth) child)
 
 renderParameter : Parameter -> String

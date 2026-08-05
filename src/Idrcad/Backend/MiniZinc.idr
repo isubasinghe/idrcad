@@ -49,6 +49,14 @@ renderLinearExpr (Multiply left right) = Nothing
 renderLinearExpr (Divide left right) = Nothing
 renderLinearExpr (Negate expression) =
   map (\rendered => "(-" ++ rendered ++ ")") (renderLinearExpr expression)
+renderLinearExpr (Modulo left right) = Nothing
+renderLinearExpr (Power base exponent) = Nothing
+renderLinearExpr (Sine angle) = Nothing
+renderLinearExpr (Cosine angle) = Nothing
+renderLinearExpr (ArcCosine value) = Nothing
+renderLinearExpr (ArcTangent2 y x) = Nothing
+renderLinearExpr (SquareRoot value) = Nothing
+renderLinearExpr (Floor value) = Nothing
 
 renderConstraint : Constraint -> Either String String
 renderConstraint (Constrain left relation right message) =

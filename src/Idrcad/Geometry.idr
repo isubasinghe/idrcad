@@ -88,6 +88,11 @@ public export
 data RoofMethod = StraightSkeleton | Voronoi
 
 public export
+data OffsetMode
+  = RadialOffset Expr
+  | DeltaOffset Expr Bool
+
+public export
 data Colour
   = NamedColour String
   | RGB Expr Expr Expr
@@ -112,11 +117,14 @@ data Shape : Dimension -> Type where
   Circle : Expr -> Shape TwoD
   Polygon : List Vec2 -> Shape TwoD
   Text2D : TextOptions -> Shape TwoD
+  Import2D : String -> Maybe String -> Shape TwoD
 
   Cube : Vec3 -> Bool -> Shape ThreeD
   Sphere : Expr -> Shape ThreeD
   Cylinder : Expr -> Expr -> Expr -> Bool -> Shape ThreeD
+  Polyhedron : List Vec3 -> List (List Nat) -> Shape ThreeD
   Import3D : String -> Shape ThreeD
+  Surface : String -> Bool -> Shape ThreeD
 
   Union : List (Shape dimension) -> Shape dimension
   Difference : Shape dimension -> List (Shape dimension) -> Shape dimension
@@ -139,6 +147,7 @@ data Shape : Dimension -> Type where
   RotateExtrude : RotateExtrudeOptions -> Shape TwoD -> Shape ThreeD
   Projection : Bool -> Shape ThreeD -> Shape TwoD
   Roof : RoofMethod -> Shape TwoD -> Shape ThreeD
+  Offset2D : OffsetMode -> Shape TwoD -> Shape TwoD
 
 public export
 rectangle : Expr -> Expr -> Bool -> Shape TwoD

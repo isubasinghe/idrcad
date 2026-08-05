@@ -39,6 +39,10 @@ covering
 main : IO ()
 main = do
   check "all eleven OpenSCAD Basics models are represented" (length basics == 11)
+  check "all fifty upstream OpenSCAD examples are represented"
+    (length upstreamSourcePaths == 50 && length upstreamExamples == 50)
+  check "catalog contains three idrcad designs plus fifty upstream ports"
+    (length examples == 53)
   check "every model renders non-empty OpenSCAD" (allRender examples)
   check "default clearance-fit parameters satisfy their constraints"
     (defaultsAreValid (millionths 1) constrainedFitModel)
