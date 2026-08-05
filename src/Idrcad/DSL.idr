@@ -319,6 +319,62 @@ public export
 drilled : RectangularSolid -> Hole -> Shape ThreeD
 drilled rectangle hole = Difference rectangle.rectangleShape [hole.holeShape]
 
+||| A rectangular through-cut together with the dimensions and centre used to
+||| constrain neighbouring features. Width and depth include the requested
+||| per-side clearance.
+public export
+record RectangularCutout where
+  constructor MkRectangularCutout
+  cutoutWidth : Expr
+  cutoutDepth : Expr
+  cutoutHalfWidth : Expr
+  cutoutHalfDepth : Expr
+  cutoutCentre : Point3D
+  cutoutShape : Shape ThreeD
+
+||| Cut a nominal rectangular component profile through a rectangular solid.
+||| `clearance` is added on both sides of both dimensions, using exact fixed-
+||| point arithmetic. The feature also registers four edge-containment
+||| constraints against its parent solid.
+public export
+rectangularCutout :
+  (name : String) ->
+  (nominalWidth : Fixed) ->
+  (nominalDepth : Fixed) ->
+  (clearance : Fixed) ->
+  Point3D ->
+  RectangularSolid ->
+  Design RectangularCutout
+rectangularCutout name nominalWidth nominalDepth clearance point rectangle =
+  let width = exact (addFixed nominalWidth (addFixed clearance clearance))
+      depth = exact (addFixed nominalDepth (addFixed clearance clearance))
+      halfWidth = half width
+      halfDepth = half depth
+      Point x y z = point
+      cutter = Translate3D (MkVec3 x y z) $
+        Cube (MkVec3 width depth (rectangle.rectangleHeight + 2)) True
+   in do
+        positive (name ++ " width") width
+        positive (name ++ " depth") depth
+        assert (halfWidth .<=. x)
+          (name ++ " must remain inside the rectangle's left edge")
+        assert (x + halfWidth .<=. rectangle.rectangleWidth)
+          (name ++ " must remain inside the rectangle's right edge")
+        assert (halfDepth .<=. y)
+          (name ++ " must remain inside the rectangle's front edge")
+        assert (y + halfDepth .<=. rectangle.rectangleDepth)
+          (name ++ " must remain inside the rectangle's back edge")
+        pure (MkRectangularCutout
+          width depth halfWidth halfDepth point cutter)
+
+||| Remove several already-constrained features from a rectangular solid.
+public export
+cutFeatures :
+  RectangularSolid ->
+  List (Shape ThreeD) ->
+  Shape ThreeD
+cutFeatures rectangle features = Difference rectangle.rectangleShape features
+
 public export
 record FitAllowance where
   constructor Allowance

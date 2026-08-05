@@ -6,6 +6,7 @@ import Idrcad.Expr
 import Idrcad.Fixed
 import Idrcad.Geometry
 import Idrcad.Model
+import Idrcad.Examples.FrontPanel
 import Idrcad.Examples.PartialFit
 
 e : Integer -> Expr
@@ -477,6 +478,7 @@ examples : List (String, Model ThreeD)
 examples =
   ("constrained-fit", constrainedFitModel)
     :: ("partial-fit", partialFitModel)
+    :: ("front-panel", frontPanelModel)
     :: basics
 
 public export

@@ -1,0 +1,11 @@
+package front_panel
+
+version = 0.1.0
+brief = "A constraint-laid-out, self-sizing electronics front panel"
+
+sourcedir = "."
+depends = idrcad
+modules = Main
+
+main = Main
+executable = front-panel

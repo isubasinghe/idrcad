@@ -4,6 +4,7 @@ import Idrcad.Backend.OpenSCAD
 import Idrcad.Backend.MiniZinc
 import Idrcad.Constraint
 import Idrcad.Examples.Basics
+import Idrcad.Examples.FrontPanel
 import Idrcad.Examples.PartialFit
 import Idrcad.Expr
 import Idrcad.Fixed
@@ -62,4 +63,16 @@ main = do
       Right environment =>
         solutionIsValid environment partialFitModel
           && bindingEquals "pin_radius" 9700000 environment
+      Left problem => False
+  solvedFrontPanel <- solve frontPanelModel
+  check "front panel size and positions are derived by MiniZinc" $
+    case solvedFrontPanel of
+      Right environment =>
+        solutionIsValid environment frontPanelModel
+          && bindingEquals "panel_width" 116900000 environment
+          && bindingEquals "panel_depth" 85700000 environment
+          && bindingEquals "display_x" 58450000 environment
+          && bindingEquals "display_y" 42850000 environment
+          && bindingEquals "encoder_x" 100700000 environment
+          && bindingEquals "usb_y" 15900000 environment
       Left problem => False

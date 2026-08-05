@@ -1,6 +1,6 @@
 EXAMPLE ?= constrained-fit
 
-.PHONY: build run list test constrained-fitting partial-fit repl clean
+.PHONY: build run list test constrained-fitting partial-fit front-panel repl clean
 
 build:
 	idris2 --build idrcad.ipkg
@@ -27,6 +27,12 @@ partial-fit: build
 		IDRIS2_PREFIX="$(CURDIR)/build/example-prefix" \
 		idris2 --build partial-fit.ipkg
 
+front-panel: build
+	IDRIS2_PREFIX="$(CURDIR)/build/example-prefix" idris2 --install idrcad.ipkg
+	cd examples/front-panel && \
+		IDRIS2_PREFIX="$(CURDIR)/build/example-prefix" \
+		idris2 --build front-panel.ipkg
+
 repl:
 	idris2 src/Main.idr
 
@@ -35,3 +41,4 @@ clean:
 	idris2 --clean idrcad-tests.ipkg
 	cd examples/constrained-fitting && idris2 --clean constrained-fitting.ipkg
 	cd examples/partial-fit && idris2 --clean partial-fit.ipkg
+	cd examples/front-panel && idris2 --clean front-panel.ipkg

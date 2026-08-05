@@ -1,89 +1,29 @@
 # idrcad
 
-An experimental constraint-derived CAD language in Idris 2. Models are built
-as a typed Idris AST and compiled to OpenSCAD source.
+Describe what must fit, align, and stay apart. Let the solver determine the
+dimensions and positions, then emit ordinary OpenSCAD.
 
-The first compatibility target is every `.scad` model in OpenSCAD's
-[`examples/Basics`](https://github.com/openscad/openscad/tree/fa8ff8916a9090d9bc64e9d3ad2725ba1aa74dce/examples/Basics)
-directory at revision `fa8ff8916a9090d9bc64e9d3ad2725ba1aa74dce`.
+![A solver-laid-out electronics front panel](docs/front-panel.png)
 
-## Get started
+`idrcad` is an experimental constraint-derived CAD language in Idris 2. It
+combines a dimension-checked geometry tree, exact fixed-point measurements,
+MiniZinc constraint solving, and OpenSCAD as a practical rendering backend.
 
-Enter the reproducible development shell. This provides Idris 2 and
-`idris2-lsp`:
+## Why idrcad?
 
-```sh
-nix develop "path:$PWD"
-```
+- Express relationships such as *inside*, *centred*, *right of*, and *fits
+  with clearance* instead of manually synchronising coordinates.
+- Leave sizes and positions partially specified and have MiniZinc complete the
+  design or optimize it.
+- Model tolerances without floating-point arithmetic: all solver values are
+  arbitrary-precision integer ticks.
+- Catch 2D/3D geometry mistakes through Idris types.
+- Recheck every solver result in Idris before it reaches generated geometry.
 
-Build and generate the default clearance-fit example:
-
-```sh
-make build
-./build/exec/idrcad constrained-fit > constrained-fit.scad
-openscad constrained-fit.scad
-```
-
-List or generate the ported OpenSCAD examples:
-
-```sh
-make list
-./build/exec/idrcad logo > logo.scad
-./build/exec/idrcad rotate-extrude > rotate-extrude.scad
-```
-
-Run the Idris tests:
-
-```sh
-make test
-```
-
-A standalone worked example lives in
-[`examples/constrained-fitting`](examples/constrained-fitting). It derives a
-pin radius from a toleranced hole and minimum-clearance requirement.
-
-[`examples/partial-fit`](examples/partial-fit) demonstrates a partial setup:
-a rectangular plate and centered hole are derived structurally while only the
-matching pin radius is exposed to MiniZinc as a decision variable.
-
-## Architecture
-
-- `Idrcad.Expr` defines symbolic scalar arithmetic and evaluation.
-- `Idrcad.Fixed` stores exact values as arbitrary-precision integer ticks.
-- `Idrcad.Constraint` defines equality and ordering relations, runtime
-  validation, and dependent proofs for clearance and toleranced fits.
-- `Idrcad.Geometry` defines a dimension-indexed geometry AST.
-- `Idrcad.Model` combines parameters, constraints, and geometry.
-- `Idrcad.DSL` provides the natural authoring layer over those core types.
-- `Idrcad.Backend.OpenSCAD` renders models and constraints as `.scad` source.
-- `Idrcad.Backend.MiniZinc` lowers the integer-linear constraint fragment to
-  a solver-independent `.mzn` model.
-- `Idrcad.Solver.MiniZinc` invokes MiniZinc, parses its integer solution, and
-  rejects it unless Idris independently revalidates every bound and constraint.
-- `Idrcad.Examples.Basics` contains the upstream Basics ports and the
-  clearance-fit example.
-
-`Shape` is indexed by dimension:
+For example, a hole and its matching pin share an axis by construction while
+MiniZinc chooses the largest safe pin radius:
 
 ```idris
-Shape TwoD
-Shape ThreeD
-```
-
-Operations preserve or explicitly change that index. For example,
-`Difference` requires all its operands to have the same dimension,
-`LinearExtrude` converts `Shape TwoD` into `Shape ThreeD`, and `Projection`
-does the reverse. Dimensionally invalid geometry therefore fails during Idris
-type checking.
-
-## Natural DSL
-
-Import `Idrcad.DSL` to get exact units, symbolic arithmetic, relation
-operators, the model builder, and the common geometry vocabulary in one place:
-
-```idris
-import Idrcad.DSL
-
 fitting = design "Centered hole with fitted cylinder" $ do
   let plate = rectangular 40 30 5
   hole <- exact (mm 10) `at` centreOf plate `through` plate
@@ -97,56 +37,40 @@ fitting = design "Centered hole with fitted cylinder" $ do
 
   maximize pin.cylinderRadius
 
-  solid $ facets 96 $ union
-    [ colour "steelblue" (drilled plate hole)
-    , colour "orange" pin.cylinderShape
+  solid $ union
+    [ drilled plate hole
+    , pin.cylinderShape
     ]
 ```
 
-`centreOf plate` derives `(x/2, y/2, z/2)`. The hole registers containment
-constraints against all four rectangle edges. `fittedCylinder` inherits the
-hole's exact axis by construction, adds the worst-case radial fit constraint,
-and leaves only its radius for MiniZinc. This makes coincidence a typed feature
-relationship rather than three more coordinates to keep synchronized.
+## Try the front-panel solver
 
-The builder declares each free parameter and returns its `Expr` at the same
-time, so names and declarations are not repeated. Idris numeric literals in an
-expression mean exact whole units; `mm`, `microns`, and `nanometres` construct
-exact parameter values. Ordinary `+`, `-`, and `*` build the symbolic AST.
-Relations use `.==.`, `.<.`, `.<=.`, `.>.`, and `.>=.`.
-
-Common geometry reads similarly:
+The front panel in the screenshot starts from a display, USB socket, encoder,
+mounting holes, and their manufacturing clearances. The display must be
+centred, USB must be below it, and the encoder must be to its right. The model
+then says:
 
 ```idris
-plate = colour "steelblue" $
-  centeredBox plateWidth plateDepth plateThickness `cut`
-    [centeredCylinder holeRadius (plateThickness + 2)]
-
-pin = colour "orange" $
-  move3 (half plateWidth + 15) 0 0 $
-    centeredCylinder pinRadius pinLength
-
-solid $ facets 96 $ union [plate, pin]
+minimize (panelWidth + panelDepth)
 ```
 
-The DSL is only a surface layer: it produces the same dimension-indexed
-`Shape`, `Constraint`, and `Model` values as the explicit constructors. A
-constraint can still be checked against an `Environment` in Idris and is also
-emitted as an OpenSCAD assertion:
+MiniZinc derives a `116.9 × 85.7 × 3 mm` panel and every component position.
 
-```scad
-assert(pin_radius + pin_tolerance + minimum_clearance + hole_tolerance
-       <= hole_radius);
+```sh
+nix develop "path:$PWD"
+make build
+./build/exec/idrcad --solve front-panel > front-panel.scad
+openscad front-panel.scad
 ```
 
-For exact compile-time dimensions, `ClearanceFit` and `TolerancedFit` carry
-erased `LTE` proofs.
+The command invokes MiniZinc itself, parses the integer solution, validates all
+bounds and constraints in Idris, and substitutes the checked values into the
+OpenSCAD output.
 
-## Exact solver arithmetic
+## Exact constraints
 
-The model contains no `Double` values. `Fixed` stores every scalar as an Idris
-`Integer`, with one whole CAD unit represented by `1,000,000` ticks. The
-authoring DSL gives those ticks physical names:
+There are no `Double` values in the constraint model. One CAD unit is stored
+as `1,000,000` integer ticks:
 
 ```idris
 mm          10  -- 10.000000 mm
@@ -154,60 +78,30 @@ microns    100  --  0.100000 mm
 nanometres   1  --  0.000001 mm
 ```
 
-Addition and subtraction are exact. Multiplication and division return
-`Nothing` unless their result is exactly representable at this resolution.
-Decimal text is produced only while rendering OpenSCAD.
+The MiniZinc backend accepts the integer-linear fragment: comparisons,
+addition, subtraction, negation, and multiplication by whole constants. It
+rejects fractional coefficients, division, and products of unknown values.
 
-Parameters also carry explicit lower and upper integer bounds. The MiniZinc
-backend accepts only the CP-SAT-friendly fragment: addition, subtraction,
-negation, comparisons, and multiplication by whole constants. It rejects
-division, fractional coefficients, and products of unknown values.
+## Examples
 
-Solve and render in one command:
+- [`examples/front-panel`](examples/front-panel): solver-driven component
+  layout and minimum panel dimensions.
+- [`examples/partial-fit`](examples/partial-fit): a known plate and hole with
+  a solver-sized matching cylinder.
+- [`examples/constrained-fitting`](examples/constrained-fitting): a toleranced
+  clearance fit.
+- `csg`, `hull`, `linear-extrude`, `logo`, `projection`, `roof`, and the other
+  bundled examples cover every model in OpenSCAD's
+  [`examples/Basics`](https://github.com/openscad/openscad/tree/fa8ff8916a9090d9bc64e9d3ad2725ba1aa74dce/examples/Basics)
+  directory at the linked revision.
+
+List everything or run the tests with:
 
 ```sh
-make build
-./build/exec/idrcad --solve partial-fit > partial-fit.scad
-openscad partial-fit.scad
+make list
+make test
 ```
 
-`idrcad` sends the generated model to MiniZinc over stdin, reads the solution,
-then independently checks parameter completeness, bounds, and every constraint
-in Idris before substituting the values into OpenSCAD. `--minizinc EXAMPLE`
-remains available only to inspect the lowered model while debugging.
-
-## Basics coverage
-
-The `idrcad` executable exposes:
-
-```text
-constrained-fit
-partial-fit
-csg
-csg-modules
-letter-block
-hull
-linear-extrude
-logo
-logo-and-text
-projection
-roof
-rotate-extrude
-text-on-cube
-```
-
-Together these exercise:
-
-- squares, circles, polygons, text, cubes, spheres, cylinders, and 3D imports;
-- union, difference, intersection, and hull;
-- translation, rotation, scale, color, highlight, and background modifiers;
-- linear extrusion, rotate extrusion, projection, and roof;
-- fragment, minimum-angle, and minimum-size resolution controls.
-
-The `projection` model references the upstream `projection.stl`, which must be
-placed beside its generated `.scad` file. The `roof` primitive requires an
-OpenSCAD version that supports `roof()`; OpenSCAD 2021.01 predates it.
-
-OpenSCAD modules are represented as ordinary Idris functions. This retains
-reuse and parameterisation while keeping generated OpenSCAD deliberately
-simple.
+The Nix development shell includes Idris 2, `idris2-lsp`, and MiniZinc.
+`--minizinc EXAMPLE` prints the generated solver model when you want to inspect
+what the DSL lowered.
