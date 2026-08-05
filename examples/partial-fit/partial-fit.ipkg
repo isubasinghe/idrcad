@@ -1,0 +1,11 @@
+package partial_fit
+
+version = 0.1.0
+brief = "A fixed socket with a partially specified matching pin"
+
+sourcedir = "."
+depends = idrcad
+modules = Main
+
+main = Main
+executable = partial-fit

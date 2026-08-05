@@ -1,0 +1,21 @@
+package idrcad
+
+version = 0.1.0
+brief = "A small Idris 2 playground"
+
+sourcedir = "src"
+modules = Main,
+          Idrcad.Fixed,
+          Idrcad.Expr,
+          Idrcad.Constraint,
+          Idrcad.Geometry,
+          Idrcad.Model,
+          Idrcad.DSL,
+          Idrcad.Backend.MiniZinc,
+          Idrcad.Backend.OpenSCAD,
+          Idrcad.Solver.MiniZinc,
+          Idrcad.Examples.PartialFit,
+          Idrcad.Examples.Basics
+
+main = Main
+executable = idrcad

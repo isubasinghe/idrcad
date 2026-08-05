@@ -1,0 +1,21 @@
+package idrcad_tests
+
+version = 0.1.0
+brief = "Tests for the idrcad DSL"
+
+sourcedir = "src"
+modules = Test,
+          Idrcad.Fixed,
+          Idrcad.Expr,
+          Idrcad.Constraint,
+          Idrcad.Geometry,
+          Idrcad.Model,
+          Idrcad.DSL,
+          Idrcad.Backend.MiniZinc,
+          Idrcad.Backend.OpenSCAD,
+          Idrcad.Solver.MiniZinc,
+          Idrcad.Examples.PartialFit,
+          Idrcad.Examples.Basics
+
+main = Test
+executable = idrcad-tests
