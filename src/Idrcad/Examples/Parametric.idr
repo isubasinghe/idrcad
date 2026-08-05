@@ -29,11 +29,11 @@ candleStandModel = design "OpenSCAD Parametric: constrained candle stand" $ do
     mm 25 `within` (mm 15 `to` mm 40)
   holderRadius <- parameter "holder_radius" $
     mm 4 `within` (mm 4 `to` mm 7)
-  candleRadius <- parameter "candle_radius" $
-    mm 3 `within` (mm 2 `to` mm 5)
-  clearance <- tolerance "candle_clearance" (microns 250) (mm 1)
 
-  assert (candleRadius + clearance .<=. holderRadius)
+  let candleRadius = exact (mm 3)
+      requiredClearance = exact (microns 250)
+
+  assert (candleRadius + requiredClearance .<=. holderRadius)
     "Candle and radial clearance must fit each holder"
   assert (3 * holderRadius .<=. ringRadius)
     "Ring radius must leave conservative spacing between holders"
@@ -49,7 +49,7 @@ candleStandModel = design "OpenSCAD Parametric: constrained candle stand" $ do
       supportRing = Translate3D (MkVec3 0 0 top) $
         extrude 4 $ Difference (Circle ringRadius) [Circle (ringRadius - 2)]
 
-  minimize ringRadius
+  minimize (ringRadius + standHeight)
 
   solid $ WithResolution (resolution (Just 96) Nothing Nothing) $ Union
     [ Cylinder standHeight 2 2 False

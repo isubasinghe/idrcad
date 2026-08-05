@@ -90,10 +90,9 @@ rejects fractional coefficients, division, and products of unknown values.
   a solver-sized matching cylinder.
 - [`examples/constrained-fitting`](examples/constrained-fitting): a toleranced
   clearance fit.
-- `csg`, `hull`, `linear-extrude`, `logo`, `projection`, `roof`, and the other
-  bundled examples cover every model in OpenSCAD's
-  [`examples/Basics`](https://github.com/openscad/openscad/tree/fa8ff8916a9090d9bc64e9d3ad2725ba1aa74dce/examples/Basics)
-  directory at the linked revision.
+- The [coverage map](docs/examples.md) links runnable Idris ports to all 50
+  files in OpenSCAD's `Advanced`, `Basics`, `Functions`, `Old`, and
+  `Parametric` example groups at the pinned upstream revision.
 
 List everything or run the tests with:
 
