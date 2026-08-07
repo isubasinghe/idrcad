@@ -126,6 +126,46 @@ renderConstraint : Constraint -> String
 renderConstraint (Constrain left relation right message) =
   "assert(" ++ renderExpr left ++ " " ++ renderRelation relation ++ " "
     ++ renderExpr right ++ ", " ++ quoted message ++ ");"
+renderConstraint (NonOverlapping footprints message) =
+  renderPositiveFootprints footprints
+    ++ renderFootprintPairs footprints
+  where
+    renderPositiveFootprint : Footprint2D -> String
+    renderPositiveFootprint footprint =
+      "assert(" ++ renderExpr footprint.footprintWidth ++ " > 0 && "
+        ++ renderExpr footprint.footprintDepth ++ " > 0, "
+        ++ quoted (message ++ ": footprints must have positive dimensions")
+        ++ ");\n"
+
+    renderPositiveFootprints : List Footprint2D -> String
+    renderPositiveFootprints [] = ""
+    renderPositiveFootprints (footprint :: rest) =
+      renderPositiveFootprint footprint ++ renderPositiveFootprints rest
+
+    renderPair : Footprint2D -> Footprint2D -> String
+    renderPair left right =
+      "assert((" ++ renderExpr left.footprintX ++ " + "
+        ++ renderExpr left.footprintWidth ++ " <= "
+        ++ renderExpr right.footprintX ++ ") || ("
+        ++ renderExpr right.footprintX ++ " + "
+        ++ renderExpr right.footprintWidth ++ " <= "
+        ++ renderExpr left.footprintX ++ ") || ("
+        ++ renderExpr left.footprintY ++ " + "
+        ++ renderExpr left.footprintDepth ++ " <= "
+        ++ renderExpr right.footprintY ++ ") || ("
+        ++ renderExpr right.footprintY ++ " + "
+        ++ renderExpr right.footprintDepth ++ " <= "
+        ++ renderExpr left.footprintY ++ "), " ++ quoted message ++ ");\n"
+
+    renderAgainst : Footprint2D -> List Footprint2D -> String
+    renderAgainst footprint [] = ""
+    renderAgainst footprint (candidate :: rest) =
+      renderPair footprint candidate ++ renderAgainst footprint rest
+
+    renderFootprintPairs : List Footprint2D -> String
+    renderFootprintPairs [] = ""
+    renderFootprintPairs (footprint :: rest) =
+      renderAgainst footprint rest ++ renderFootprintPairs rest
 
 renderBlock : Nat -> String -> String -> String
 renderBlock depth header body =

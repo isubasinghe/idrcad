@@ -35,6 +35,10 @@ bindingEquals requested expected ((name, MkFixed value) :: rest) =
     then value == expected
     else bindingEquals requested expected rest
 
+box : Integer -> Integer -> Integer -> Integer -> Footprint2D
+box x y width depth = Footprint
+  (integer x) (integer y) (integer width) (integer depth)
+
 covering
 main : IO ()
 main = do
@@ -53,6 +57,11 @@ main = do
       constrainedFitModel.modelConstraints))
   check "all fitting constraints are in the CP-SAT integer-linear fragment"
     (allSolverConstraints constrainedFitModel.modelConstraints)
+  check "native 2D packing accepts touching boxes and rejects overlap"
+    (satisfies (millionths 0) []
+      (NonOverlapping [box 0 0 10 10, box 10 0 5 5] "touching")
+      && not (satisfies (millionths 0) []
+        (NonOverlapping [box 0 0 10 10, box 9 0 5 5] "overlap")))
   check "the fitting model lowers to MiniZinc without floats" $
     case renderMiniZinc constrainedFitModel of
       Right source => length (unpack source) > 20
@@ -73,10 +82,10 @@ main = do
     case solvedFrontPanel of
       Right environment =>
         solutionIsValid environment frontPanelModel
-          && bindingEquals "panel_width" 116900000 environment
-          && bindingEquals "panel_depth" 85700000 environment
-          && bindingEquals "display_x" 58450000 environment
-          && bindingEquals "display_y" 42850000 environment
-          && bindingEquals "encoder_x" 100700000 environment
-          && bindingEquals "usb_y" 15900000 environment
+          && bindingEquals "width_0" 116900000 environment
+          && bindingEquals "depth_1" 85700000 environment
+          && bindingEquals "x_2" 58450000 environment
+          && bindingEquals "y_3" 42850000 environment
+          && bindingEquals "x_6" 100700000 environment
+          && bindingEquals "y_5" 15900000 environment
       Left problem => False

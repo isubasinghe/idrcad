@@ -45,16 +45,29 @@ fitting = design "Centered hole with fitted cylinder" $ do
 
 ## Try the front-panel solver
 
-The front panel in the screenshot starts from a display, USB socket, encoder,
-mounting holes, and their manufacturing clearances. The display must be
-centred, USB must be below it, and the encoder must be to its right. The model
-then says:
+The front panel in the screenshot has no hand-named coordinates or layout
+equations. Features expose typed 2D footprints, so the same words work for
+cutouts, bores, and structural patterns:
 
 ```idris
-minimize (panelWidth + panelDepth)
+panel <- plate (between 70 150) (between 50 100) (exactly 3)
+display <- centeredCutout panel $
+  rect 52 30 `withClearance` (microns 250)
+usb <- cutoutIn panel $ rect 13 7 `withClearance` (microns 200)
+encoder <- boreIn panel (mm 4)
+screws <- cornerBores panel (mm 5) (microns 1600)
+
+alignX usb display
+usb `below` display $ 8
+alignY encoder display
+encoder `rightOf` display $ 12
+
+spaced (mm 4) [footprint display, footprint usb, footprint encoder]
+minimumPlate panel
 ```
 
-MiniZinc derives a `116.9 × 85.7 × 3 mm` panel and every component position.
+The complete example adds the screw relationships; MiniZinc derives a
+`116.9 × 85.7 × 3 mm` panel and every anonymous component position.
 
 ```sh
 nix develop "path:$PWD"
@@ -78,9 +91,10 @@ microns    100  --  0.100000 mm
 nanometres   1  --  0.000001 mm
 ```
 
-The MiniZinc backend accepts the integer-linear fragment: comparisons,
-addition, subtraction, negation, and multiplication by whole constants. It
-rejects fractional coefficients, division, and products of unknown values.
+The MiniZinc backend accepts the integer-linear fragment plus a native 2D
+non-overlap global: comparisons, addition, subtraction, negation, and
+multiplication by whole constants. It rejects fractional coefficients,
+division, and products of unknown values.
 
 ## Examples
 
