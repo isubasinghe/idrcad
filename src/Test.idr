@@ -1,5 +1,6 @@
 module Test
 
+import Data.String
 import Idrcad.Backend.OpenSCAD
 import Idrcad.Backend.MiniZinc
 import Idrcad.Constraint
@@ -9,9 +10,12 @@ import Idrcad.Examples.PartialFit
 import Idrcad.Expr
 import Idrcad.Fixed
 import Idrcad.Geometry
+import Idrcad.Language.Compiler
 import Idrcad.Model
 import Idrcad.Solver.MiniZinc
 import System
+import System.File
+import Text.FC
 
 check : String -> Bool -> IO ()
 check label True = putStrLn ("PASS: " ++ label)
@@ -38,6 +42,14 @@ bindingEquals requested expected ((name, MkFixed value) :: rest) =
 box : Integer -> Integer -> Integer -> Integer -> Footprint2D
 box x y width depth = Footprint
   (integer x) (integer y) (integer width) (integer depth)
+
+semanticFailure : Either LanguageError (Model ThreeD) -> Bool
+semanticFailure (Left (SemanticFailure problem)) = True
+semanticFailure result = False
+
+parseFailure : Either LanguageError (Model ThreeD) -> Bool
+parseFailure (Left (ParseFailure problem)) = True
+parseFailure result = False
 
 covering
 main : IO ()
@@ -89,3 +101,36 @@ main = do
           && bindingEquals "x_6" 100700000 environment
           && bindingEquals "y_5" 15900000 environment
       Left problem => False
+  sourceResult <- readFile "examples/front-panel/front-panel.idrcad"
+  case sourceResult of
+    Left problem => check "textual front panel source is readable" False
+    Right source => case compileSource
+        (FileSrc "examples/front-panel/front-panel.idrcad") source of
+      Left problem => check "textual front panel parses and elaborates" False
+      Right languageModel => do
+        check "textual front panel elaborates into the integer solver fragment"
+          (length languageModel.modelParameters == 8
+            && allSolverConstraints languageModel.modelConstraints)
+        solvedLanguage <- solve languageModel
+        check "textual and Idris front panels derive the same layout" $
+          case solvedLanguage of
+            Right environment =>
+              solutionIsValid environment languageModel
+                && bindingEquals "width_0" 116900000 environment
+                && bindingEquals "depth_1" 85700000 environment
+                && bindingEquals "x_2" 58450000 environment
+                && bindingEquals "y_3" 42850000 environment
+                && bindingEquals "x_6" 100700000 environment
+                && bindingEquals "y_5" 15900000 environment
+            Left problem => False
+  check "unknown textual feature references fail during elaboration" $
+    semanticFailure $ compileSource Virtual $ unlines
+      [ "model broken"
+      , "panel = plate(width = 10mm, depth = 10mm, height = 2mm)"
+      , "center missing in panel"
+      ]
+  check "over-precise decimal measurements fail during parsing" $
+    parseFailure $ compileSource Virtual $ unlines
+      [ "model broken"
+      , "panel = plate(width = 10mm, depth = 10mm, height = 0.0000001mm)"
+      ]

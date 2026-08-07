@@ -2,6 +2,7 @@ package idrcad_tests
 
 version = 0.1.0
 brief = "Tests for the idrcad DSL"
+depends = parser
 
 sourcedir = "src"
 modules = Test,
@@ -11,6 +12,9 @@ modules = Test,
           Idrcad.Geometry,
           Idrcad.Model,
           Idrcad.DSL,
+          Idrcad.Language.Syntax,
+          Idrcad.Language.Parser,
+          Idrcad.Language.Compiler,
           Idrcad.Backend.MiniZinc,
           Idrcad.Backend.OpenSCAD,
           Idrcad.Solver.MiniZinc,

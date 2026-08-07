@@ -1,0 +1,38 @@
+# A complete solver-driven model written without Idris syntax.
+model front_panel
+
+panel = plate(
+  width = 70mm..150mm,
+  depth = 50mm..100mm,
+  height = 3mm
+)
+
+display = cutout(
+  width = 52mm,
+  depth = 30mm,
+  clearance = 0.25mm
+) in panel
+
+usb = cutout(
+  width = 13mm,
+  depth = 7mm,
+  clearance = 0.20mm
+) in panel
+
+encoder = bore(radius = 4mm) in panel
+screws = corner_bores(radius = 1.6mm, edge = 5mm) in panel
+
+center display in panel
+align_x usb with display
+usb below display by 8mm
+
+align_y encoder with display
+encoder right_of display by 12mm
+
+encoder left_of screws.lower_right by 4mm
+usb above screws.lower_left by 4mm
+between_columns display screws.lower_left screws.lower_right by 4mm
+between_rows display screws.lower_left screws.upper_left by 4mm
+
+space [display, usb, encoder, screws] by 4mm
+minimize panel

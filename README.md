@@ -1,120 +1,85 @@
 # idrcad
 
-Describe what must fit, align, and stay apart. Let the solver determine the
-dimensions and positions, then emit ordinary OpenSCAD.
+Describe what must fit, align, and stay apart. `idrcad` solves the missing
+dimensions and positions, checks the result, and emits ordinary OpenSCAD.
 
 ![A solver-laid-out electronics front panel](docs/front-panel.png)
 
-`idrcad` is an experimental constraint-derived CAD language in Idris 2. It
-combines a dimension-checked geometry tree, exact fixed-point measurements,
-MiniZinc constraint solving, and OpenSCAD as a practical rendering backend.
+```idrcad
+model front_panel
 
-## Why idrcad?
+panel = plate(
+  width = 70mm..150mm,
+  depth = 50mm..100mm,
+  height = 3mm
+)
 
-- Express relationships such as *inside*, *centred*, *right of*, and *fits
-  with clearance* instead of manually synchronising coordinates.
-- Leave sizes and positions partially specified and have MiniZinc complete the
-  design or optimize it.
-- Model tolerances without floating-point arithmetic: all solver values are
-  arbitrary-precision integer ticks.
-- Catch 2D/3D geometry mistakes through Idris types.
-- Recheck every solver result in Idris before it reaches generated geometry.
+display = cutout(width = 52mm, depth = 30mm, clearance = 0.25mm) in panel
+usb = cutout(width = 13mm, depth = 7mm, clearance = 0.20mm) in panel
+encoder = bore(radius = 4mm) in panel
+screws = corner_bores(radius = 1.6mm, edge = 5mm) in panel
 
-For example, a hole and its matching pin share an axis by construction while
-MiniZinc chooses the largest safe pin radius:
-
-```idris
-fitting = design "Centered hole with fitted cylinder" $ do
-  let plate = rectangular 40 30 5
-  hole <- exact (mm 10) `at` centreOf plate `through` plate
-
-  pin <- fittedCylinder
-    "pin"
-    hole
-    (mm 5 `within` (mm 1 `to` mm 10))
-    16
-    (allowing (microns 100) (microns 100) (microns 100))
-
-  maximize pin.cylinderRadius
-
-  solid $ union
-    [ drilled plate hole
-    , pin.cylinderShape
-    ]
+center display in panel
+usb below display by 8mm
+encoder right_of display by 12mm
+space [display, usb, encoder, screws] by 4mm
+minimize panel
 ```
 
-## Try the front-panel solver
+No Idris knowledge is required to write a `.idrcad` model. Idris remains
+behind the language as its type checker and trusted model builder.
 
-The front panel in the screenshot has no hand-named coordinates or layout
-equations. Features expose typed 2D footprints, so the same words work for
-cutouts, bores, and structural patterns:
-
-```idris
-panel <- plate (between 70 150) (between 50 100) (exactly 3)
-display <- centeredCutout panel $
-  rect 52 30 `withClearance` (microns 250)
-usb <- cutoutIn panel $ rect 13 7 `withClearance` (microns 200)
-encoder <- boreIn panel (mm 4)
-screws <- cornerBores panel (mm 5) (microns 1600)
-
-alignX usb display
-usb `below` display $ 8
-alignY encoder display
-encoder `rightOf` display $ 12
-
-spaced (mm 4) [footprint display, footprint usb, footprint encoder]
-minimumPlate panel
-```
-
-The complete example adds the screw relationships; MiniZinc derives a
-`116.9 × 85.7 × 3 mm` panel and every anonymous component position.
+## Try it
 
 ```sh
 nix develop "path:$PWD"
 make build
-./build/exec/idrcad --solve front-panel > front-panel.scad
+
+./build/exec/idrcad check examples/front-panel/front-panel.idrcad
+./build/exec/idrcad build examples/front-panel/front-panel.idrcad > front-panel.scad
 openscad front-panel.scad
 ```
 
-The command invokes MiniZinc itself, parses the integer solution, validates all
-bounds and constraints in Idris, and substitutes the checked values into the
-OpenSCAD output.
+The front-panel example derives a `116.9 × 85.7 × 3 mm` plate and all
+component positions. `build` invokes MiniZinc itself, independently validates
+the returned integer solution, and substitutes it into the OpenSCAD output.
 
-## Exact constraints
+Use `idrcad minizinc FILE.idrcad` to inspect the generated constraint model.
+The complete language reference is in [docs/language.md](docs/language.md).
 
-There are no `Double` values in the constraint model. One CAD unit is stored
-as `1,000,000` integer ticks:
+## Why idrcad?
 
-```idris
-mm          10  -- 10.000000 mm
-microns    100  --  0.100000 mm
-nanometres   1  --  0.000001 mm
-```
+- Write relationships such as `center`, `right_of`, and `space`, with exact
+  dimensions and clearances
+  instead of synchronising coordinates by hand.
+- Leave dimensions and positions partially specified for the solver.
+- Get source-located parse and semantic errors for unknown names, invalid
+  feature relationships, bad ranges, and excessive decimal precision.
+- Model tolerances without floating point: one millimetre is exactly
+  `1,000,000` arbitrary-precision integer ticks.
+- Recheck every solver result before it reaches generated geometry.
+- Use the Idris API directly when the small language is not expressive enough.
 
-The MiniZinc backend accepts the integer-linear fragment plus a native 2D
-non-overlap global: comparisons, addition, subtraction, negation, and
-multiplication by whole constants. It rejects fractional coefficients,
-division, and products of unknown values.
+The solver fragment supports comparisons, addition, subtraction, negation,
+whole-number coefficients, and native 2D non-overlap. Division, products of
+unknowns, and fractional solver coefficients are rejected.
 
 ## Examples
 
-- [`examples/front-panel`](examples/front-panel): solver-driven component
-  layout and minimum panel dimensions.
+- [`examples/front-panel`](examples/front-panel): the same solver-driven panel
+  in the textual language and the advanced Idris API.
 - [`examples/partial-fit`](examples/partial-fit): a known plate and hole with
   a solver-sized matching cylinder.
 - [`examples/constrained-fitting`](examples/constrained-fitting): a toleranced
   clearance fit.
-- The [coverage map](docs/examples.md) links runnable Idris ports to all 50
-  files in OpenSCAD's `Advanced`, `Basics`, `Functions`, `Old`, and
-  `Parametric` example groups at the pinned upstream revision.
-
-List everything or run the tests with:
+- The [coverage map](docs/examples.md) links Idris ports to all 50 pinned
+  upstream OpenSCAD examples.
 
 ```sh
 make list
 make test
 ```
 
-The Nix development shell includes Idris 2, `idris2-lsp`, and MiniZinc.
-`--minizinc EXAMPLE` prints the generated solver model when you want to inspect
-what the DSL lowered.
+The pinned Nix shell includes Idris 2, `idris2-lsp`, `idris2-parser`, and
+MiniZinc. The Idris modules remain available as an advanced, fully typed
+authoring API.

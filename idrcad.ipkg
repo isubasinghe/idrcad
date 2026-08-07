@@ -2,6 +2,7 @@ package idrcad
 
 version = 0.1.0
 brief = "A small Idris 2 playground"
+depends = parser
 
 sourcedir = "src"
 modules = Main,
@@ -11,6 +12,9 @@ modules = Main,
           Idrcad.Geometry,
           Idrcad.Model,
           Idrcad.DSL,
+          Idrcad.Language.Syntax,
+          Idrcad.Language.Parser,
+          Idrcad.Language.Compiler,
           Idrcad.Backend.MiniZinc,
           Idrcad.Backend.OpenSCAD,
           Idrcad.Solver.MiniZinc,

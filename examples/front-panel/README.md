@@ -17,8 +17,9 @@ From the repository root:
 
 ```sh
 nix develop "path:$PWD"
-make front-panel
-./examples/front-panel/build/exec/front-panel > front-panel.scad
+make build
+./build/exec/idrcad check examples/front-panel/front-panel.idrcad
+./build/exec/idrcad build examples/front-panel/front-panel.idrcad > front-panel.scad
 openscad front-panel.scad
 ```
 
@@ -30,5 +31,7 @@ encoder centre = (100.7, 42.85)
 USB centre     = (58.45, 15.9)
 ```
 
-Use `--defaults` to inspect the authored starting values, or `--minizinc` to
-inspect the integer constraint model. Normal use invokes MiniZinc itself.
+The `.idrcad` file is the normal human-facing version. `Main.idr` contains the
+same design written against the advanced Idris API. Use `idrcad minizinc
+examples/front-panel/front-panel.idrcad` to inspect the integer constraint
+model. Normal `build` use invokes MiniZinc itself.

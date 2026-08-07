@@ -269,6 +269,25 @@ design name (Designing action) =
         state.draftObjective
         geometry
 
+||| Finish a design whose authoring layer can report an error. This is useful
+||| for textual frontends: parsing and name resolution remain outside the core
+||| geometry language, while successfully elaborated models use the same IR.
+public export
+designEither :
+  String ->
+  Design (Either error (Shape dimension)) ->
+  Either error (Model dimension)
+designEither name (Designing action) =
+  let (result, state) = action emptyBuild
+   in case result of
+        Left problem => Left problem
+        Right geometry => Right $ MkModel
+          name
+          (reverse state.draftParameters)
+          (reverse state.draftConstraints)
+          state.draftObjective
+          geometry
+
 ||| Mark the geometry returned by a design block.
 public export
 solid : Shape dimension -> Design (Shape dimension)
@@ -485,6 +504,10 @@ HasFootprint RectangularCutout where
           (y - cutout.cutoutHalfDepth)
           cutout.cutoutWidth
           cutout.cutoutDepth
+
+public export
+HasFootprint Footprint2D where
+  footprint = id
 
 rightEdge : Footprint2D -> Expr
 rightEdge box = box.footprintX + box.footprintWidth
