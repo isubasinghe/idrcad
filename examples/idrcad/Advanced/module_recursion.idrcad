@@ -1,0 +1,7 @@
+# Recursion is packaged as a terminating, level-bounded geometry combinator.
+model advanced_module_recursion
+
+tree2d = branching_tree(levels = 8, length = 100mm, thickness = 5mm)
+tree3d = extrude tree2d (height = 1mm, center = false)
+result = colour tree3d "forestgreen"
+solid result

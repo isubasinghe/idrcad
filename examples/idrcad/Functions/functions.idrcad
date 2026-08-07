@@ -1,0 +1,16 @@
+# Sample two mathematical paths with reusable geometry.
+model functions_functions
+
+sample = sphere(radius = 1mm)
+p0 = move sample by [-40mm, -19mm, 0mm]
+p1 = move sample by [-30mm, -14mm, 0mm]
+p2 = move sample by [-20mm, -9mm, 0mm]
+p3 = move sample by [-10mm, -4mm, 0mm]
+p4 = move sample by [0mm, 1mm, 0mm]
+p5 = move sample by [10mm, 6mm, 0mm]
+p6 = move sample by [20mm, 11mm, 0mm]
+p7 = move sample by [30mm, 16mm, 0mm]
+p8 = move sample by [40mm, 21mm, 0mm]
+line = hull [p0, p1, p2, p3, p4, p5, p6, p7, p8]
+result = colour line "red"
+solid result

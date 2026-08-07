@@ -1,0 +1,11 @@
+model old_example005
+outer = cylinder(height = 50mm, bottom = 100mm, top = 100mm, center = false)
+inner = cylinder(height = 50mm, bottom = 80mm, top = 80mm, center = false)
+inner_high = move inner by [0mm, 0mm, 10mm]
+shell = difference outer by [inner_high]
+post = cylinder(height = 200mm, bottom = 10mm, top = 10mm, center = false)
+posts = ring post (count = 6, radius = 80mm)
+cone = cylinder(height = 80mm, bottom = 120mm, top = 0mm, center = false)
+cone_high = move cone by [0mm, 0mm, 200mm]
+result = union [shell, posts, cone_high]
+solid result

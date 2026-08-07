@@ -1,0 +1,7 @@
+# Total recursive computation can feed ordinary text geometry.
+model functions_recursion
+
+answer2d = text(value = "6! = 720", size = 10mm)
+answer3d = extrude answer2d (height = 1mm, center = false)
+result = colour answer3d "cyan"
+solid result

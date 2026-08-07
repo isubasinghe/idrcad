@@ -1,0 +1,9 @@
+# A first-level Menger sponge expressed as three orthogonal cuts.
+model old_example024
+body = box(width = 100mm, depth = 100mm, height = 100mm, center = true)
+cut_x = box(width = 110mm, depth = 33.333333mm, height = 33.333333mm, center = true)
+cut_y = rotate cut_x by [0deg, 0deg, 90deg]
+cut_z = rotate cut_x by [0deg, 90deg, 0deg]
+sponge = difference body by [cut_x, cut_y, cut_z]
+posed = rotate sponge by [45deg, 35.264389deg, 0deg]
+solid posed

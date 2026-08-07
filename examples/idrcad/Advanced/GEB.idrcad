@@ -1,0 +1,16 @@
+# Three perpendicular extruded letters intersect in one 3D ambigram.
+model advanced_geb
+
+g2 = text(value = "G", size = 10mm)
+e2 = text(value = "E", size = 10mm)
+b2 = text(value = "B", size = 10mm)
+
+g3 = extrude g2 (height = 20mm, center = true)
+e3_raw = extrude e2 (height = 20mm, center = true)
+b3_raw = extrude b2 (height = 20mm, center = true)
+e3 = rotate e3_raw by [90deg, 0deg, 0deg]
+b3 = rotate b3_raw by [90deg, 0deg, 90deg]
+
+letters = intersection [g3, e3, b3]
+result = colour letters "ivory"
+solid result

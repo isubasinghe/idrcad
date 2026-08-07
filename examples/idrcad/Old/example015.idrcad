@@ -1,0 +1,9 @@
+model old_example015
+outer = rectangle(width = 100mm, depth = 100mm, center = true)
+inner = rectangle(width = 50mm, depth = 50mm, center = true)
+frame = difference outer by [inner]
+band_raw = rectangle(width = 100mm, depth = 30mm, center = true)
+band = rotate2 band_raw by 45deg
+profile = intersection [frame, band]
+result = extrude profile (height = 1mm, center = false)
+solid result

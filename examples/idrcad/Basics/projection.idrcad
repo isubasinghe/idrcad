@@ -1,0 +1,11 @@
+# Projection is type checked: 3D import -> 2D shadow -> 3D panel.
+model basics_projection
+
+source = import3d(path = "assets/openscad/Basics/projection.stl")
+shadow2d = projection source cut false
+shadow3d = extrude shadow2d (height = 2mm, center = true)
+panel = move shadow3d by [0mm, 0mm, -20mm]
+source_hint = background source
+
+result = union [source_hint, panel]
+solid result

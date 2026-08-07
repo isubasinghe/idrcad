@@ -1,6 +1,6 @@
 EXAMPLE ?= constrained-fit
 
-.PHONY: build run list test constrained-fitting partial-fit front-panel repl clean
+.PHONY: build run list test idrcad-examples constrained-fitting partial-fit front-panel repl clean
 
 build:
 	idris2 --build idrcad.ipkg
@@ -11,9 +11,15 @@ run: build
 list: build
 	./build/exec/idrcad --list
 
-test:
+test: build
 	idris2 --build idrcad-tests.ipkg
 	./build/exec/idrcad-tests
+	$(MAKE) idrcad-examples
+
+idrcad-examples: build
+	@test "$$(find examples/idrcad -type f -name '*.idrcad' | wc -l)" -eq 51
+	find examples/idrcad -type f -name '*.idrcad' -print0 | sort -z | \
+		xargs -0 -n1 ./build/exec/idrcad check
 
 constrained-fitting: build
 	IDRIS2_PREFIX="$(CURDIR)/build/example-prefix" idris2 --install idrcad.ipkg

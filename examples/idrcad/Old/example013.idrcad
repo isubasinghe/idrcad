@@ -1,0 +1,7 @@
+model old_example013
+profile = import2d(path = "assets/openscad/Old/example013.dxf")
+source = extrude profile (height = 100mm, center = true)
+source_x = rotate source by [0deg, 90deg, 0deg]
+source_y = rotate source by [90deg, 0deg, 0deg]
+result = intersection [source, source_x, source_y]
+solid result

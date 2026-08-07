@@ -1,0 +1,14 @@
+# Revolve a translated 2D profile around the Z axis.
+model basics_rotate_extrude
+
+profile = rectangle(width = 5mm, depth = 5mm, center = false)
+offset_profile = move2 profile by [10mm, 0mm]
+torus = revolve offset_profile (angle = 360deg, convexity = 10)
+torus_color = colour torus "red"
+
+partial_profile = move2 profile by [20mm, 0mm]
+partial = revolve partial_profile (angle = 180deg, convexity = 10)
+partial_color = colour partial "magenta"
+
+result = union [torus_color, partial_color]
+solid result

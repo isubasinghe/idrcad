@@ -1,0 +1,8 @@
+model old_example009
+section = import2d(path = "assets/openscad/Old/example009.dxf")
+body_raw = extrude section (height = 50mm, center = true)
+body = background body_raw
+fan_profile = circle(radius = 28mm)
+fan = twist_extrude fan_profile (height = 30mm, center = true, twist = -35deg, scale = 0.6, slices = 10)
+result = union [body, fan]
+solid result

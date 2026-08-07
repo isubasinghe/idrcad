@@ -1,0 +1,38 @@
+# Four raised letters and two engraved symbols, matching the upstream example.
+model basics_text_on_cube
+
+block_raw = box(width = 60mm, depth = 60mm, height = 60mm, center = true)
+block = colour block_raw "gray"
+
+c2d = text(value = "C", size = 50mm)
+c3d = extrude c2d (height = 5mm, center = false)
+c_rotated = rotate c3d by [90deg, 0deg, 0deg]
+c_face = move c_rotated by [0mm, -27.5mm, 0mm]
+
+u2d = text(value = "U", size = 50mm)
+u3d = extrude u2d (height = 5mm, center = false)
+u_rotated = rotate u3d by [90deg, 0deg, 90deg]
+u_face = move u_rotated by [27.5mm, 0mm, 0mm]
+
+b2d = text(value = "B", size = 50mm)
+b3d = extrude b2d (height = 5mm, center = false)
+b_rotated = rotate b3d by [90deg, 0deg, 180deg]
+b_face = move b_rotated by [0mm, 27.5mm, 0mm]
+
+e2d = text(value = "E", size = 50mm)
+e3d = extrude e2d (height = 5mm, center = false)
+e_rotated = rotate e3d by [90deg, 0deg, -90deg]
+e_face = move e_rotated by [-27.5mm, 0mm, 0mm]
+
+raised = union [block, c_face, u_face, b_face, e_face]
+
+smile2d = text(value = "☺", size = 50mm)
+smile3d = extrude smile2d (height = 5mm, center = false)
+smile = move smile3d by [0mm, 0mm, 27.5mm]
+
+sun2d = text(value = "☼", size = 50mm)
+sun3d = extrude sun2d (height = 5mm, center = false)
+sun = move sun3d by [0mm, 0mm, -32.5mm]
+
+result = difference raised by [smile, sun]
+solid result

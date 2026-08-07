@@ -1,0 +1,7 @@
+model old_example012
+body = sphere(radius = 20mm)
+mesh = import3d(path = "assets/openscad/Old/example012.stl")
+mesh_rotated = rotate mesh by [180deg, 0deg, 180deg]
+mesh_placed = move mesh_rotated by [-2.92mm, 0.5mm, 20mm]
+result = difference body by [mesh_placed]
+solid result

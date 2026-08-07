@@ -1,0 +1,16 @@
+# Offset acts only on 2D shapes; extrusion makes the result solid.
+model advanced_offset
+
+base2d = rectangle(width = 50mm, depth = 50mm, center = true)
+expanded2d = offset base2d (delta = 10mm, chamfer = false)
+base3d = twist_extrude expanded2d (height = 20mm, center = false, twist = 0deg, scale = 0.5, slices = 8)
+
+outer = circle(radius = 15mm)
+outer_offset = offset outer (delta = 1mm, chamfer = false)
+inner_offset = offset outer (delta = -1mm, chamfer = false)
+outline2d = difference outer_offset by [inner_offset]
+outline3d_raw = extrude outline2d (height = 20mm, center = false)
+outline3d = move outline3d_raw by [0mm, 0mm, 20mm]
+
+result = union [base3d, outline3d]
+solid result

@@ -1,0 +1,5 @@
+model old_example010
+terrain = surface(path = "assets/openscad/Old/example010.dat", center = true)
+terrain_rotated = rotate terrain by [0deg, 0deg, 45deg]
+result = intersection [terrain, terrain_rotated]
+solid result

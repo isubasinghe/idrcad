@@ -1,0 +1,10 @@
+# Text is 2D until extrusion changes its type to a 3D cutting tool.
+model basics_letter_block
+
+block = box(width = 30mm, depth = 30mm, height = 15mm, center = true)
+letter2d = text(value = "Y", size = 22mm)
+letter3d = extrude letter2d (height = 30mm, center = true)
+engraving = move letter3d by [0mm, 0mm, 5mm]
+
+result = difference block by [engraving]
+solid result

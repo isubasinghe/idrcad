@@ -1,0 +1,10 @@
+model old_example006
+die = rounded_box(width = 100mm, depth = 100mm, height = 100mm, radius = 10mm)
+pip = sphere(radius = 10mm)
+pip_center = move pip by [0mm, -50mm, 0mm]
+pip_a = move pip by [-25mm, -50mm, -25mm]
+pip_b = move pip by [25mm, -50mm, 25mm]
+pip_top = move pip by [0mm, 0mm, 50mm]
+result = difference die by [pip_center, pip_a, pip_b, pip_top]
+smooth = facets result 48
+solid smooth

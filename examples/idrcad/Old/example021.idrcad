@@ -1,0 +1,11 @@
+model old_example021
+body = sphere(radius = 25mm)
+hole = cylinder(height = 62.5mm, bottom = 12.5mm, top = 6.25mm, center = true)
+carved = difference body by [hole]
+shadow2d = projection carved cut false
+shadow3d = extrude shadow2d (height = 0.5mm, center = true)
+shadow = move shadow3d by [-30mm, 0mm, 0mm]
+hint_raw = move carved by [30mm, 0mm, 0mm]
+hint = background hint_raw
+result = union [shadow, hint]
+solid result

@@ -1,0 +1,22 @@
+# Compose the logo with independently extruded, positioned labels.
+model basics_logo_and_text
+
+body = sphere(radius = 30mm)
+hole = cylinder(height = 75mm, bottom = 7.5mm, top = 7.5mm, center = true)
+hole_x = rotate hole by [0deg, 90deg, 0deg]
+hole_y = rotate hole by [90deg, 0deg, 0deg]
+mark = difference body by [hole, hole_x, hole_y]
+mark_color = colour mark "steelblue"
+
+open2d = text(value = "Open", size = 20mm)
+open3d = extrude open2d (height = 2mm, center = false)
+open_color = colour open3d "yellowgreen"
+open = move open_color by [40mm, 5mm, -10mm]
+
+scad2d = text(value = "SCAD", size = 20mm)
+scad3d = extrude scad2d (height = 2mm, center = false)
+scad_color = colour scad3d "gold"
+scad = move scad_color by [85mm, 5mm, -10mm]
+
+result = union [mark_color, open, scad]
+solid result

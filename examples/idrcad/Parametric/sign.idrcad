@@ -1,0 +1,12 @@
+# Plate dimensions and mounting-hole locations are solver variables.
+model parametric_sign
+
+sign = plate(width = 80mm..240mm, depth = 40mm..120mm, height = 3mm)
+mounts = corner_bores(radius = 2mm, edge = 6mm) in sign
+label = cutout(width = 60mm, depth = 18mm, clearance = 1mm) in sign
+
+center label in sign
+between_columns label mounts.lower_left mounts.lower_right by 5mm
+between_rows label mounts.lower_left mounts.upper_left by 5mm
+space [label, mounts] by 5mm
+minimize sign

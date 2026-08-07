@@ -1,0 +1,20 @@
+# Requirements enter the model as checked constraints, not comments.
+model advanced_assert
+
+require 10mm at_least 10mm because "ring radius must be at least 10 mm"
+require 20mm at_least 3mm because "ring supports at least three members"
+
+small = box(width = 4mm, depth = 4mm, height = 4mm, center = true)
+small_ring_raw = ring small (count = 3, radius = 10mm)
+small_ring = colour small_ring_raw "red"
+
+medium = box(width = 6mm, depth = 6mm, height = 6mm, center = true)
+medium_ring_raw = ring medium (count = 9, radius = 25mm)
+medium_ring = colour medium_ring_raw "green"
+
+large = box(width = 8mm, depth = 8mm, height = 8mm, center = true)
+large_ring_raw = ring large (count = 20, radius = 40mm)
+large_ring = colour large_ring_raw "blue"
+
+result = union [small_ring, medium_ring, large_ring]
+solid result

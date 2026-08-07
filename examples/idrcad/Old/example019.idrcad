@@ -1,0 +1,15 @@
+model old_example019
+column = cylinder(height = 60mm, bottom = 6mm, top = 2mm, center = false)
+c0 = move column by [-50mm, 0mm, -30mm]
+c1 = move column by [-40mm, 0mm, -24mm]
+c2 = move column by [-30mm, 0mm, -18mm]
+c3 = move column by [-20mm, 0mm, -12mm]
+c4 = move column by [-10mm, 0mm, -6mm]
+c5 = move column by [0mm, 0mm, 0mm]
+c6 = move column by [10mm, 0mm, 6mm]
+c7 = move column by [20mm, 0mm, 12mm]
+c8 = move column by [30mm, 0mm, 18mm]
+c9 = move column by [40mm, 0mm, 24mm]
+c10 = move column by [50mm, 0mm, 30mm]
+result = union [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+solid result

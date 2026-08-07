@@ -1,0 +1,17 @@
+# Named shapes make reusable CSG read like a small assembly.
+model basics_csg_modules
+
+body_raw = sphere(radius = 10mm)
+body = colour body_raw "blue"
+clip_raw = box(width = 15mm, depth = 15mm, height = 15mm, center = true)
+clip = colour clip_raw "red"
+core = intersection [body, clip]
+
+hole_raw = cylinder(height = 20mm, bottom = 5mm, top = 5mm, center = true)
+hole_x = rotate hole_raw by [0deg, 90deg, 0deg]
+hole_y = rotate hole_raw by [90deg, 0deg, 0deg]
+holes = union [hole_raw, hole_x, hole_y]
+
+result = difference core by [holes]
+smooth = facets result 64
+solid smooth

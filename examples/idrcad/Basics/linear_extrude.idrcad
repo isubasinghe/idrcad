@@ -1,0 +1,19 @@
+# One 2D profile drives straight, scaled, and twisted extrusions.
+model basics_linear_extrude
+
+profile = rectangle(width = 20mm, depth = 10mm, center = true)
+
+straight_raw = extrude profile (height = 20mm, center = false)
+straight_color = colour straight_raw "red"
+straight = move straight_color by [0mm, -30mm, 0mm]
+
+taper_raw = twist_extrude profile (height = 20mm, center = false, twist = 0deg, scale = 0.2, slices = 8)
+taper_color = colour taper_raw "green"
+taper = move taper_color by [-30mm, 0mm, 0mm]
+
+twist_raw = twist_extrude profile (height = 20mm, center = false, twist = 90deg, scale = 1, slices = 24)
+twist_color = colour twist_raw "cyan"
+twist = move twist_color by [30mm, 0mm, 0mm]
+
+result = union [straight, taper, twist]
+solid result

@@ -1,0 +1,14 @@
+# Explicit names make each indexed child independently inspectable.
+model advanced_children_indexed
+
+cube = box(width = 5mm, depth = 5mm, height = 5mm, center = true)
+ball = sphere(radius = 4mm)
+pin = cylinder(height = 5mm, bottom = 4mm, top = 4mm, center = false)
+
+cube_a = move cube by [-30mm, 0mm, 0mm]
+ball_a = move ball by [0mm, 20mm, 0mm]
+pin_a = move pin by [30mm, 40mm, 0mm]
+
+group = union [cube_a, ball_a, pin_a]
+result = colour group "cyan"
+solid result

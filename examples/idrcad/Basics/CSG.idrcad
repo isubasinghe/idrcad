@@ -1,0 +1,16 @@
+# Union, intersection, and difference over reusable typed solids.
+model basics_csg
+
+cube = box(width = 15mm, depth = 15mm, height = 15mm, center = true)
+ball = sphere(radius = 10mm)
+
+joined = union [cube, ball]
+left = move joined by [-24mm, 0mm, 0mm]
+
+middle = intersection [cube, ball]
+
+carved = difference cube by [ball]
+right = move carved by [24mm, 0mm, 0mm]
+
+result = union [left, middle, right]
+solid result

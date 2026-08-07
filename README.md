@@ -66,17 +66,20 @@ unknowns, and fractional solver coefficients are rejected.
 
 ## Examples
 
+- [`examples/idrcad`](examples/idrcad): authored textual ports of all 50
+  upstream OpenSCAD examples, plus a native constraint-driven model.
 - [`examples/front-panel`](examples/front-panel): the same solver-driven panel
   in the textual language and the advanced Idris API.
 - [`examples/partial-fit`](examples/partial-fit): a known plate and hole with
   a solver-sized matching cylinder.
 - [`examples/constrained-fitting`](examples/constrained-fitting): a toleranced
   clearance fit.
-- The [coverage map](docs/examples.md) links Idris ports to all 50 pinned
-  upstream OpenSCAD examples.
+- The [coverage map](docs/examples.md) links the advanced Idris ports to the
+  same 50 pinned upstream OpenSCAD examples.
 
 ```sh
 make list
+make idrcad-examples
 make test
 ```
 

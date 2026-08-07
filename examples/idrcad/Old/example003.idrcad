@@ -1,0 +1,11 @@
+model old_example003
+core = box(width = 30mm, depth = 30mm, height = 30mm, center = true)
+arm_x = box(width = 40mm, depth = 15mm, height = 15mm, center = true)
+arm_y = box(width = 15mm, depth = 40mm, height = 15mm, center = true)
+arm_z = box(width = 15mm, depth = 15mm, height = 40mm, center = true)
+body = union [core, arm_x, arm_y, arm_z]
+cut_x = box(width = 50mm, depth = 10mm, height = 10mm, center = true)
+cut_y = box(width = 10mm, depth = 50mm, height = 10mm, center = true)
+cut_z = box(width = 10mm, depth = 10mm, height = 50mm, center = true)
+result = difference body by [cut_x, cut_y, cut_z]
+solid result

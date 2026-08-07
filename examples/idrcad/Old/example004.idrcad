@@ -1,0 +1,5 @@
+model old_example004
+cube = box(width = 30mm, depth = 30mm, height = 30mm, center = true)
+ball = sphere(radius = 20mm)
+result = difference cube by [ball]
+solid result

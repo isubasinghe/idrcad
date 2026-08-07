@@ -1,0 +1,17 @@
+# Polygon and star generators replace coordinate-heavy comprehensions.
+model functions_list_comprehensions
+
+triangle = regular_polygon(sides = 3, radius = 10mm)
+hex_raw = regular_polygon(sides = 6, radius = 8mm)
+hex = move2 hex_raw by [22mm, 0mm]
+dec_raw = regular_polygon(sides = 10, radius = 6mm)
+dec = move2 dec_raw by [40mm, 0mm]
+
+star20_raw = star(points = 10, inner = 6mm, outer = 10mm)
+star20 = move2 star20_raw by [0mm, 24mm]
+star40_raw = star(points = 20, inner = 6mm, outer = 8mm)
+star40 = move2 star40_raw by [22mm, 24mm]
+
+profiles = union [triangle, hex, dec, star20, star40]
+result = extrude profiles (height = 1mm, center = false)
+solid result

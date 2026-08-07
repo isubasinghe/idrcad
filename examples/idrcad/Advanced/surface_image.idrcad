@@ -1,0 +1,15 @@
+# Height-map data is imported as geometry, sliced, and layered.
+model advanced_surface_image
+
+terrain = surface(path = "assets/openscad/Advanced/surface_image.png", center = true)
+slice2d = projection terrain cut true
+slice3d = extrude slice2d (height = 2mm, center = false)
+
+layer1 = colour slice3d "indianred"
+layer2_raw = move slice3d by [0mm, 0mm, 2mm]
+layer2 = colour layer2_raw "firebrick"
+layer3_raw = move slice3d by [0mm, 0mm, 4mm]
+layer3 = colour layer3_raw "darkred"
+
+result = union [layer1, layer2, layer3]
+solid result

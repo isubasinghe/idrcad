@@ -1,0 +1,15 @@
+model old_example018
+ball = sphere(radius = 15mm)
+cube = box(width = 30mm, depth = 30mm, height = 30mm, center = true)
+pin = cylinder(height = 30mm, bottom = 15mm, top = 15mm, center = true)
+a = move ball by [-45mm, -45mm, 0mm]
+b = move cube by [0mm, -45mm, 0mm]
+c = move pin by [45mm, -45mm, 0mm]
+d = move cube by [-45mm, 0mm, 0mm]
+e = move pin by [0mm, 0mm, 0mm]
+f = move ball by [45mm, 0mm, 0mm]
+g = move pin by [-45mm, 45mm, 0mm]
+h = move ball by [0mm, 45mm, 0mm]
+i = move cube by [45mm, 45mm, 0mm]
+result = union [a, b, c, d, e, f, g, h, i]
+solid result

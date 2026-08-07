@@ -1,0 +1,7 @@
+model old_example001
+body = sphere(radius = 25mm)
+hole = cylinder(height = 62.5mm, bottom = 12.5mm, top = 12.5mm, center = true)
+hole_x = rotate hole by [0deg, 90deg, 0deg]
+hole_y = rotate hole by [90deg, 0deg, 0deg]
+result = difference body by [hole, hole_x, hole_y]
+solid result

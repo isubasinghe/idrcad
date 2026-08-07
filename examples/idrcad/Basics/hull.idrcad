@@ -1,0 +1,17 @@
+# Hull joins disconnected primitives into a single envelope.
+model basics_hull
+
+tip = sphere(radius = 1mm)
+tip_high = move tip by [0mm, 30mm, 2.5mm]
+
+bar = box(width = 20mm, depth = 1mm, height = 8mm, center = true)
+bar_a = move bar by [0mm, 10mm, -1mm]
+bar_b = move bar by [0mm, -8mm, -1mm]
+
+foot = box(width = 16mm, depth = 1mm, height = 4mm, center = true)
+foot_low = move foot by [0mm, -30mm, 1mm]
+
+shell = hull [tip_high, bar_a, bar_b, foot_low]
+axis = cylinder(height = 40mm, bottom = 1mm, top = 1mm, center = false)
+result = union [shell, axis]
+solid result

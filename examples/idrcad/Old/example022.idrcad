@@ -1,0 +1,9 @@
+model old_example022
+slab_a = box(width = 10mm, depth = 30mm, height = 40mm, center = true)
+slab_b = box(width = 20mm, depth = 20mm, height = 40mm, center = true)
+left_raw = hull [slab_a, slab_b]
+left = move left_raw by [-15mm, 0mm, 0mm]
+right_raw = rounded_box(width = 20mm, depth = 30mm, height = 40mm, radius = 5mm)
+right = move right_raw by [15mm, 0mm, 0mm]
+result = union [left, right]
+solid result

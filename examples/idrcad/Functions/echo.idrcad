@@ -1,0 +1,17 @@
+# Pure-function results can be made visible as generated geometry.
+model functions_echo
+
+line1_2d = text(value = "f1(3,5) = 25.5", size = 7mm)
+line1 = extrude line1_2d (height = 1mm, center = false)
+
+line2_2d = text(value = "f2(4) = 64", size = 7mm)
+line2_3d = extrude line2_2d (height = 1mm, center = false)
+line2 = move line2_3d by [0mm, -10mm, 0mm]
+
+line3_2d = text(value = "f3(5) = 20", size = 7mm)
+line3_3d = extrude line3_2d (height = 1mm, center = false)
+line3 = move line3_3d by [0mm, -20mm, 0mm]
+
+lines = union [line1, line2, line3]
+result = colour lines "cyan"
+solid result

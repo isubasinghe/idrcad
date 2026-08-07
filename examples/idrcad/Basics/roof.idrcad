@@ -1,0 +1,13 @@
+# A polygon remains 2D until the roof operation creates a 3D solid.
+model basics_roof
+
+outline = polygon(points = [
+  [-5mm, -1mm], [-0.15mm, -1mm], [0mm, 0mm], [0.15mm, -1mm],
+  [5mm, -1mm], [5mm, -0.1mm], [4mm, 0mm], [5mm, 0.1mm], [5mm, 1mm], [-5mm, 1mm]
+])
+straight = roof outline voronoi false
+voronoi_raw = roof outline voronoi true
+voronoi = move voronoi_raw by [0mm, -5mm, 0mm]
+
+result = union [straight, voronoi]
+solid result

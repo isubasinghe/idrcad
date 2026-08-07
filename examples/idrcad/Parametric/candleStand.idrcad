@@ -1,0 +1,10 @@
+# A constraint-derived candle tray: the solver chooses the smallest safe base.
+model parametric_candle_stand
+
+tray = plate(width = 40mm..120mm, depth = 40mm..120mm, height = 4mm)
+center_candle = bore(radius = 3.25mm) in tray
+outer_candles = corner_bores(radius = 3.25mm, edge = 8mm) in tray
+
+center center_candle in tray
+space [center_candle, outer_candles] by 8mm
+minimize tray

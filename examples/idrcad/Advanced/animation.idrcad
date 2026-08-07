@@ -1,0 +1,20 @@
+# A deterministic frame of the upstream SCARA animation.
+model advanced_animation
+
+joint = sphere(radius = 4mm)
+small_joint = sphere(radius = 2mm)
+
+arm1_end = move small_joint by [70mm, 0mm, 0mm]
+arm1_raw = hull [small_joint, arm1_end]
+arm1_color = colour arm1_raw "red"
+arm1 = rotate arm1_color by [0deg, 0deg, 35deg]
+
+arm2_end = move small_joint by [50mm, 0mm, 0mm]
+arm2_raw = hull [small_joint, arm2_end]
+arm2_rotated = rotate arm2_raw by [0deg, 0deg, 83deg]
+arm2_at_joint = move arm2_rotated by [57.34mm, 40.15mm, 0mm]
+arm2 = colour arm2_at_joint "green"
+
+base = cylinder(height = 12mm, bottom = 2mm, top = 2mm, center = true)
+result = union [base, joint, arm1, arm2]
+solid result

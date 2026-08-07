@@ -5,12 +5,15 @@ revision [`fa8ff891`](https://github.com/openscad/openscad/tree/fa8ff8916a9090d9
 The accompanying DXF, STL, image, and height-map inputs are kept under
 `assets/openscad` with the upstream CC0 dedication.
 
-The ports preserve the teaching purpose of each example. They are intentionally
-not transliterations: OpenSCAD modules receiving `children()` become typed Idris
-functions, comprehensions become lists, recursion is total, Customizer values
-become bounded parameters, and assertions may become solver constraints.
+Every upstream path has an authored textual counterpart under
+`examples/idrcad` with `.scad` changed to `.idrcad`. The ports preserve the
+teaching purpose rather than transliterating line by line: child modules become
+named reusable geometry, comprehensions become patterns, recursion is bounded,
+Customizer values become solver ranges, and assertions become constraints.
 
-| Upstream source | `idrcad` example |
+The table also gives the corresponding advanced Idris API/legacy CLI name.
+
+| Upstream source | Advanced API example |
 | --- | --- |
 | `Advanced/GEB.scad` | `advanced-geb` |
 | `Advanced/animation.scad` | `advanced-animation` |
@@ -63,11 +66,12 @@ become bounded parameters, and assertions may become solver constraints.
 | `Parametric/candleStand.scad` | `parametric-candle-stand` |
 | `Parametric/sign.scad` | `parametric-sign` |
 
-Generate any port with:
+Build an authored textual port with:
 
 ```sh
-./build/exec/idrcad EXAMPLE > model.scad
+./build/exec/idrcad build examples/idrcad/Basics/CSG.idrcad > model.scad
 ```
 
-Use `--solve EXAMPLE` for models containing free parameters and `--list` for
-the complete command-name list.
+Use `idrcad check FILE.idrcad` for fast parser and type checking. The older
+`idrcad EXAMPLE` command names in the table remain available for the advanced
+Idris-authored variants.

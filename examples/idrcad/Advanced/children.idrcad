@@ -1,0 +1,15 @@
+# A child solid can be reused by higher-level placement patterns.
+model advanced_children
+
+cube = box(width = 8mm, depth = 8mm, height = 8mm, center = true)
+cube_ring_raw = ring cube (count = 6, radius = 15mm)
+cube_ring = colour cube_ring_raw "red"
+
+ball = sphere(radius = 5mm)
+hole = cylinder(height = 12mm, bottom = 2mm, top = 2mm, center = true)
+bead = difference ball by [hole]
+bead_ring_raw = ring bead (count = 12, radius = 30mm)
+bead_ring = colour bead_ring_raw "green"
+
+result = union [cube_ring, bead_ring]
+solid result

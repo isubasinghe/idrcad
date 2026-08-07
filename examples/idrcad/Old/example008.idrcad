@@ -1,0 +1,7 @@
+model old_example008
+letters = import2d(path = "assets/openscad/Old/example008.dxf")
+front = extrude letters (height = 50mm, center = true)
+side_a = rotate front by [90deg, 0deg, 0deg]
+side_b = rotate front by [0deg, 90deg, 0deg]
+result = intersection [front, side_a, side_b]
+solid result

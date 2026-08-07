@@ -1,0 +1,11 @@
+model old_example016
+block = box(width = 65mm, depth = 28mm, height = 28mm, center = true)
+blade = box(width = 60mm, depth = 28mm, height = 14mm, center = true)
+blade_high = move blade by [0mm, 0mm, 7.5mm]
+tool = import3d(path = "assets/openscad/Old/example016.stl")
+tool_left = move tool by [-18mm, 0mm, 0mm]
+cut = difference blade_high by [tool_left]
+cut90 = rotate cut by [90deg, 0deg, 0deg]
+cut180 = rotate cut by [180deg, 0deg, 0deg]
+result = difference block by [cut, cut90, cut180]
+solid result

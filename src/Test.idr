@@ -134,3 +134,21 @@ main = do
       [ "model broken"
       , "panel = plate(width = 10mm, depth = 10mm, height = 0.0000001mm)"
       ]
+  check "textual CSG elaborates through the dimension-indexed geometry IR" $
+    case compileSource Virtual $ unlines
+      [ "model csg"
+      , "cube = box(width = 15mm, depth = 15mm, height = 15mm, center = true)"
+      , "ball = sphere(radius = 10mm)"
+      , "result = difference cube by [ball]"
+      , "solid result"
+      ] of
+        Right model => length (unpack (renderModel model)) > 20
+        Left problem => False
+  check "textual CSG rejects mixed 2D and 3D operands" $
+    semanticFailure $ compileSource Virtual $ unlines
+      [ "model broken"
+      , "profile = circle(radius = 10mm)"
+      , "ball = sphere(radius = 10mm)"
+      , "bad = union [profile, ball]"
+      , "solid ball"
+      ]

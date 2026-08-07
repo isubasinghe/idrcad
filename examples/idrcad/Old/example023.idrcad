@@ -1,0 +1,5 @@
+model old_example023
+word2d = text(value = "twelve", size = 4mm)
+word3d = extrude word2d (height = 2mm, center = false)
+words = ring word3d (count = 12, radius = 16mm)
+solid words

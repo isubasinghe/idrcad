@@ -1,0 +1,20 @@
+model old_example017
+outer2 = circle(radius = 106mm)
+outer_hole = circle(radius = 75mm)
+outer_ring2 = difference outer2 by [outer_hole]
+outer_ring = extrude outer_ring2 (height = 6mm, center = false)
+
+inner2 = circle(radius = 37mm)
+inner_hole = circle(radius = 25mm)
+inner_ring2 = difference inner2 by [inner_hole]
+inner_ring3 = extrude inner_ring2 (height = 6mm, center = false)
+inner_ring = move inner_ring3 by [0mm, 0mm, 74mm]
+
+brace = box(width = 6mm, depth = 80mm, height = 6mm, center = true)
+braces = ring brace (count = 3, radius = 80mm)
+bottle = cylinder(height = 68mm, bottom = 25mm, top = 18mm, center = false)
+bottle_high = move bottle by [0mm, 0mm, 12mm]
+hint = background bottle_high
+
+result = union [outer_ring, inner_ring, braces, hint]
+solid result

@@ -1,0 +1,7 @@
+model old_example014
+beam = box(width = 100mm, depth = 20mm, height = 20mm, center = true)
+beam_a = rotate beam by [10deg, 20deg, 300deg]
+beam_b = rotate beam by [200deg, 40deg, 57deg]
+beam_c = rotate beam by [20deg, 88deg, 57deg]
+result = intersection [beam, beam_a, beam_b, beam_c]
+solid result

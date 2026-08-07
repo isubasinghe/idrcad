@@ -1,0 +1,6 @@
+model old_example011
+pyramid = polyhedron(
+  points = [[10mm, 0mm, 0mm], [0mm, 10mm, 0mm], [-10mm, 0mm, 0mm], [0mm, -10mm, 0mm], [0mm, 0mm, 10mm]],
+  faces = [[0, 1, 2, 3], [4, 1, 0], [4, 2, 1], [4, 3, 2], [4, 0, 3]]
+)
+solid pyramid

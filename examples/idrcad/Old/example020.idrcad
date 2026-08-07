@@ -1,0 +1,13 @@
+model old_example020
+thread2d = star(points = 9, inner = 15mm, outer = 20mm)
+bolt_raw = twist_extrude thread2d (height = 100mm, center = false, twist = 411.428571deg, scale = 1, slices = 64)
+bolt = move bolt_raw by [-30mm, 0mm, 0mm]
+
+nut_outer = regular_polygon(sides = 6, radius = 30mm)
+nut3d = extrude nut_outer (height = 20mm, center = false)
+nut_hole = cylinder(height = 40mm, bottom = 18mm, top = 18mm, center = true)
+nut_cut = difference nut3d by [nut_hole]
+nut = move nut_cut by [30mm, 0mm, 0mm]
+
+result = union [bolt, nut]
+solid result

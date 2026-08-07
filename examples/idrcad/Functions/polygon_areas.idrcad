@@ -1,0 +1,20 @@
+# Geometry and its computed annotation stay in one typed assembly.
+model functions_polygon_areas
+
+triangle2d = regular_polygon(sides = 3, radius = 10mm)
+triangle3d = extrude triangle2d (height = 1mm, center = false)
+triangle = move triangle3d by [-30mm, 0mm, 0mm]
+
+square2d = regular_polygon(sides = 4, radius = 10mm)
+square3d = extrude square2d (height = 1mm, center = false)
+
+hex2d = regular_polygon(sides = 6, radius = 10mm)
+hex3d = extrude hex2d (height = 1mm, center = false)
+hex = move hex3d by [30mm, 0mm, 0mm]
+
+label2d = text(value = "areas: 130  200  260", size = 6mm)
+label3d = extrude label2d (height = 1mm, center = false)
+label = move label3d by [-38mm, -20mm, 0mm]
+
+result = union [triangle, square3d, hex, label]
+solid result

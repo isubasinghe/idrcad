@@ -31,6 +31,60 @@ Decimals are converted directly to integer ticks and may have at most six
 fractional digits. A range creates a bounded solver variable; a single value
 is fixed. Floating-point values never enter the constraint model.
 
+Geometry translations and sizes use `mm`, rotations use `deg`, and scale
+factors are unitless:
+
+```idrcad
+placed = move part by [-20mm, 0mm, 4.5mm]
+turned = rotate placed by [0deg, 90deg, 0deg]
+smaller = scale turned by [0.5, 0.5, 1]
+```
+
+## Constructive geometry
+
+Geometry is a sequence of named declarations followed by one `solid` output:
+
+```idrcad
+cube = box(width = 15mm, depth = 15mm, height = 15mm, center = true)
+ball = sphere(radius = 10mm)
+joined = union [cube, ball]
+carved = difference cube by [ball]
+solid carved
+```
+
+The frontend tracks dimensions. `rectangle`, `circle`, `polygon`, `text`,
+`regular_polygon`, `star`, and `import2d` produce 2D shapes. `box`,
+`rounded_box`, `sphere`, `cylinder`, `polyhedron`, `surface`, and `import3d`
+produce 3D shapes. The following operations preserve their input dimension:
+
+- `union`, `difference`, `intersection`, and `hull`
+- `move2`, `rotate2`, and `scale2` for 2D geometry
+- `move`, `rotate`, and `scale` for 3D geometry
+- `colour`, `highlight`, `background`, and `facets`
+
+Dimension-changing operations are explicit:
+
+```idrcad
+profile = rectangle(width = 20mm, depth = 10mm, center = true)
+solid_profile = extrude profile (height = 4mm, center = false)
+twisted = twist_extrude profile (
+  height = 30mm, center = false, twist = 90deg, scale = 0.5, slices = 24
+)
+shadow = projection twisted cut false
+revolved = revolve profile (angle = 180deg, convexity = 10)
+```
+
+`offset` transforms 2D geometry and `roof` converts a 2D outline to a solid.
+`ring` places a 3D child around the Z axis, while `branching_tree` constructs
+a level-bounded recursive 2D shape. See `examples/idrcad` for all forms.
+
+Static design requirements use the same constraint IR as solver-derived
+relationships:
+
+```idrcad
+require 10mm at_least 8mm because "wall thickness must be at least 8 mm"
+```
+
 ## Declarations
 
 Declarations are processed from top to bottom, and names must be unique.
@@ -53,8 +107,9 @@ plate. Their omitted coordinates become anonymous bounded solver variables.
 `corner_bores` is structural: it creates four derived holes without adding
 eight position variables.
 
-The first language version emits one root plate per file. The Idris API can
-still express arbitrary geometry trees and multiple solids.
+A constraint-first plate model emits its plate automatically. A constructive
+geometry model uses `solid name` to select its output. Both paths elaborate to
+the same dimension-indexed geometry tree.
 
 ## Relationships
 

@@ -1,0 +1,7 @@
+model old_example007
+profile = import2d(path = "assets/openscad/Old/example007.dxf")
+body = revolve profile (angle = 360deg, convexity = 3)
+cut_profile = rectangle(width = 40mm, depth = 12mm, center = true)
+cut = extrude cut_profile (height = 100mm, center = true)
+result = difference body by [cut]
+solid result

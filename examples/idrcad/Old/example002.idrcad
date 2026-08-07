@@ -1,0 +1,13 @@
+model old_example002
+block = box(width = 30mm, depth = 30mm, height = 30mm, center = true)
+stem = box(width = 15mm, depth = 15mm, height = 50mm, center = true)
+stem_low = move stem by [0mm, 0mm, -25mm]
+body = union [block, stem_low]
+bar_x = box(width = 50mm, depth = 10mm, height = 10mm, center = true)
+bar_y = box(width = 10mm, depth = 50mm, height = 10mm, center = true)
+bar_z = box(width = 10mm, depth = 10mm, height = 50mm, center = true)
+cross = union [bar_x, bar_y, bar_z]
+carved = difference body by [cross]
+cone = cylinder(height = 50mm, bottom = 20mm, top = 5mm, center = true)
+result = intersection [carved, cone]
+solid result
